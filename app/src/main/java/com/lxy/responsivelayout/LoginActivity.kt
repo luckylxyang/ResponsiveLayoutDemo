@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import com.lxy.responsivelayout.list.ListActivity
 import com.lxy.responsivelayout.main.MainActivity
 import com.lxy.responsivelayout.ui.theme.ResponsiveLayoutTheme
 
@@ -73,6 +74,11 @@ fun landView(){
         }) {
             Text(text = "登录")
         }
+        Button(onClick = {
+            startActivityLauncher.launch(Intent(context, ListActivity::class.java))
+        }) {
+            Text(text = "列表")
+        }
     }
 }
 
@@ -91,6 +97,11 @@ fun hei(){
             startActivityLauncher.launch(Intent(context, MainActivity::class.java))
         }) {
             Text(text = "登录")
+        }
+        Button(onClick = {
+            startActivityLauncher.launch(Intent(context, ListActivity::class.java))
+        }) {
+            Text(text = "列表")
         }
     }
 }

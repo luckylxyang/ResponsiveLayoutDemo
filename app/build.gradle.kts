@@ -38,6 +38,7 @@ android {
     }
     buildFeatures {
         compose = true
+        viewBinding = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.3"
@@ -61,6 +62,11 @@ dependencies {
     implementation("androidx.compose.material3:material3")
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.material3:material3-window-size-class-android:1.2.1")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.8.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.window:window:1.2.0")
+    implementation("androidx.window:window-core:1.2.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -69,6 +75,8 @@ dependencies {
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
     val nav_version = "2.7.7"
 
@@ -85,4 +93,10 @@ dependencies {
 
     // Jetpack Compose Integration
     implementation("androidx.navigation:navigation-compose:$nav_version")
+
+    implementation("androidx.compose.material3.adaptive:adaptive:1.0.0-alpha07")
+    implementation("androidx.compose.material3.adaptive:adaptive-layout:1.0.0-alpha07")
+    implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-alpha07")
+
+    implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
 }

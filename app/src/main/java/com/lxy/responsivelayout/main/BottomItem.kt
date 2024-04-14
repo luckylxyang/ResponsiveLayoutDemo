@@ -1,5 +1,7 @@
 package com.lxy.responsivelayout.main
 
+import androidx.compose.ui.graphics.vector.ImageVector
+
 /**
  *
  * @Author：liuxy
@@ -8,7 +10,7 @@ package com.lxy.responsivelayout.main
  *
  */
 data class BottomItem(
-    val iconId: Int,
+    val iconId: ImageVector,
     val name: String,
     var selected: Boolean = false,
 )

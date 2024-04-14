@@ -7,6 +7,10 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -20,14 +24,19 @@ import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSiz
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.lxy.responsivelayout.R
+import com.lxy.responsivelayout.nav.RLNavGraph
+import com.lxy.responsivelayout.nav.RLNavigationActions
 import com.lxy.responsivelayout.ui.theme.ResponsiveLayoutTheme
+import kotlinx.coroutines.launch
 
 /**
  *
@@ -38,9 +47,8 @@ import com.lxy.responsivelayout.ui.theme.ResponsiveLayoutTheme
  */
 
 val icons = arrayOf(
-    BottomItem(R.drawable.login_icon_person, "工作台", true),
-    BottomItem(R.drawable.login_icon_person, "主页"),
-    BottomItem(R.drawable.login_icon_person, "我的"),
+    BottomItem(Icons.Filled.Home, "工作台", true),
+    BottomItem(Icons.Filled.Person, "主页"),
 )
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +65,7 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val windowSizeClass = calculateWindowSizeClass(this)
                     Log.d("TAG", "Greeting: ${windowSizeClass.toString()}")
+//                    MainApp(windowSizeClass.widthSizeClass)
                     MyApp(windowSizeClass.widthSizeClass)
                 }
             }
@@ -68,23 +77,13 @@ class MainActivity : ComponentActivity() {
 fun MyApp(widthSizeClass: WindowWidthSizeClass) {
     // Select a navigation element based on window size.
     val navController = rememberNavController()
-    NavHost(navController = navController, startDestination = "welcome") {
-//        composable("welcome") { WelcomePage(navController) }
-//        composable("login") { loginPage(navController) }
-//        composable("home") { HomePage(navController) }
 
-    }
     when (widthSizeClass) {
-        WindowWidthSizeClass.Compact -> {
-            CompactScreen(navController)
-        }
-
-        WindowWidthSizeClass.Medium -> {
-            MediumScreen()
-        }
-
         WindowWidthSizeClass.Expanded -> {
-            ExpandedScreen()
+            ExpandedScreen(navController)
+        }
+        else ->{
+            CompactScreen(navController)
         }
     }
 }
@@ -92,56 +91,38 @@ fun MyApp(widthSizeClass: WindowWidthSizeClass) {
 @Composable
 fun CompactScreen(navController: NavHostController) {
 
-    Scaffold(bottomBar = {
-        NavigationBar {
-            icons.forEach { item ->
-                NavigationBarItem(
-                    selected = item.selected,
-                    onClick = { },
-                    icon = {
-                        Image(
-                            painter = painterResource(id = item.iconId),
-                            contentDescription = null
-                        )
-                    })
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            NavigationBar {
+                icons.forEach { item ->
+                    NavigationBarItem(
+                        selected = item.selected,
+                        onClick = { },
+                        icon = {
+                            Icon(item.iconId, contentDescription = item.name)
+                        })
+                }
             }
-        }
-    }) {
-        it.calculateTopPadding()
-    }
+        },
+        content = {
+            it.calculateBottomPadding()
+            RLNavGraph(
+                isExpandedScreen = false,
+                navController = navController,
+                openDrawer = {  },
+            )
+        })
 }
 
 @Composable
-fun MediumScreen() {
-    Row(modifier = Modifier.fillMaxSize()) {
-        NavigationRail {
-            icons.forEach { item ->
-                NavigationRailItem(
-                    selected = item.selected,
-                    onClick = { },
-                    icon = {
-                        Image(
-                            painter = painterResource(id = item.iconId),
-                            contentDescription = null
-                        )
-                    })
-            }
-        }
-        // Other content
-    }
-}
-
-@Composable
-fun ExpandedScreen() {
+fun MediumScreen(navController: NavHostController) {
     PermanentNavigationDrawer(
         drawerContent = {
             icons.forEach { item ->
                 NavigationDrawerItem(
                     icon = {
-                        Image(
-                            painter = painterResource(id = item.iconId),
-                            contentDescription = null
-                        )
+                        Icon(item.iconId, contentDescription = item.name)
                     },
                     label = { },
                     selected = item.selected,
@@ -153,4 +134,32 @@ fun ExpandedScreen() {
             // Other content
         }
     )
+}
+
+@Composable
+fun ExpandedScreen(navController: NavHostController) {
+
+
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        bottomBar = {
+            NavigationRail {
+                icons.forEach { item ->
+                    NavigationRailItem(
+                        selected = item.selected,
+                        onClick = { },
+                        icon = {
+                            Icon(item.iconId, contentDescription = item.name)
+                        })
+                }
+            }
+        },
+        content = {
+            it.calculateBottomPadding()
+            RLNavGraph(
+                isExpandedScreen = false,
+                navController = navController,
+                openDrawer = {  },
+            )
+        })
 }

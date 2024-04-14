@@ -1,5 +1,6 @@
 package com.lxy.responsivelayout.main
 
+import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.compose.foundation.layout.Column
@@ -12,8 +13,9 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.lxy.responsivelayout.entity.Article
 
 @Composable
-fun ArticleDetail(article : Article){
-    
+fun ArticleDetail(article: Article , viewModel: MainViewModel){
+
+
     Column(modifier = Modifier.fillMaxHeight()) {
         AndroidView(factory = {
             WebView(it).apply {
@@ -29,5 +31,5 @@ fun ArticleDetail(article : Article){
 @Composable
 fun ArticleDetailPreview(){
     val list = Article("我是一个标题", "https://developer.android.google.cn/guide/topics/large-screens/support-different-screen-sizes?hl=zh-cn", "test")
-    ArticleDetail(list)
+//    ArticleDetail(list)
 }
