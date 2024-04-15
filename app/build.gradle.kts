@@ -100,4 +100,6 @@ dependencies {
 
     implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
     implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
+
+    implementation("androidx.startup:startup-runtime:1.1.1")
 }
