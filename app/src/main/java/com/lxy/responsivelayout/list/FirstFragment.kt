@@ -1,5 +1,6 @@
 package com.lxy.responsivelayout.list
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import com.lxy.responsivelayout.R
+import com.lxy.responsivelayout.XmlActivity
 import com.lxy.responsivelayout.databinding.FragmentFirstBinding
 import com.lxy.responsivelayout.main.MainViewModel
 
@@ -38,6 +40,10 @@ class FirstFragment : Fragment() {
 
         mViewModel.select.observe(viewLifecycleOwner){
             binding.webView.loadUrl(it.url)
+        }
+
+        binding.tvButton.setOnClickListener {
+            startActivity(Intent(requireContext(), XmlActivity::class.java))
         }
 
         binding.tvBack.setOnClickListener {

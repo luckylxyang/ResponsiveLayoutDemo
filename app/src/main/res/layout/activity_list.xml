@@ -17,7 +17,7 @@
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/nav_host_fragment"
         android:name="com.lxy.responsivelayout.list.FirstFragment"
-        android:layout_width="300dp"
+        android:layout_width="280dp"
         android:layout_weight="1"
         android:layout_height="match_parent"/>
 </androidx.slidingpanelayout.widget.SlidingPaneLayout>

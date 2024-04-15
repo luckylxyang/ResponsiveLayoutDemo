@@ -99,4 +99,5 @@ dependencies {
     implementation("androidx.compose.material3.adaptive:adaptive-navigation:1.0.0-alpha07")
 
     implementation("androidx.slidingpanelayout:slidingpanelayout:1.2.0")
+    implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
 }
