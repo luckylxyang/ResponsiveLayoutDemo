@@ -24,12 +24,18 @@
             android:value="812"/>
 
         <provider
+            android:name="me.jessyan.autosize.InitProvider"
+            android:authorities="${applicationId}.autosize-init-provider"
+            tools:node="remove" />
+
+        <provider
             android:name="androidx.startup.InitializationProvider"
             android:authorities="${applicationId}.androidx-startup"
             android:exported="false"
-            tools:node="remove" >
-            <meta-data android:name="me.jessyan.autosize.InitProvider"
-                tools:node="remove" />
+            tools:node="merge" >
+            <meta-data
+                android:name="${applicationId}.AutoSizeInitializer"
+                android:value="androidx.startup"/>
         </provider>
 
         <activity

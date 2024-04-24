@@ -1,8 +1,12 @@
 package com.lxy.responsivelayout
 
 import android.app.Application
+import android.util.Log
 import androidx.startup.AppInitializer
+import me.jessyan.autosize.AutoSize
+import me.jessyan.autosize.AutoSizeConfig
 import me.jessyan.autosize.InitProvider
+import me.jessyan.autosize.utils.AutoSizeUtils
 
 
 /**
@@ -18,5 +22,9 @@ class RLApp : Application() {
         super.onCreate()
 //        AppInitializer.getInstance(baseContext)
 //            .initializeComponent(InitProvider::class.java)
+
+
+        var init = AutoSize.checkInit()
+        Log.d("TAG", "onCreate autosize init: $init")
     }
 }

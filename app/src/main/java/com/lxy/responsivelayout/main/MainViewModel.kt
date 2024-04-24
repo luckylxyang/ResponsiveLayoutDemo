@@ -25,4 +25,12 @@ class MainViewModel : ViewModel() {
     fun back(back : Boolean){
         _back.postValue(back)
     }
+
+
+    private val _dragList  = MutableLiveData<List<String>>()
+    val dragList : LiveData<List<String>> = _dragList
+
+    fun init(){
+
+    }
 }

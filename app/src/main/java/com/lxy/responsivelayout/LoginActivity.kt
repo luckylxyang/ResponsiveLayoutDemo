@@ -39,8 +39,9 @@ class LoginActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val windowSizeClass = calculateWindowSizeClass(this)
-                    Greeting(windowSizeClass)
+//                    val windowSizeClass = calculateWindowSizeClass(this)
+//                    Greeting(windowSizeClass)
+                    MainPage()
                 }
             }
         }

@@ -33,7 +33,7 @@ class XmlActivity : AppCompatActivity() {
         val width = metrics.bounds.width()
         val height = metrics.bounds.height()
         val density = resources.displayMetrics.density
-        //Xml: width = 1080, height = 2340, density = 2.88
+        // Xml: width = 1080, height = 2340, density = 2.88
         // no size: width = 1080, height = 2340, density = 2.625
         Log.d("TAG", "Xml: width = $width, height = $height, density = $density")
         val windowSizeClass = WindowSizeClass(widthDp = (width/density).toInt(), heightDp = (height/density).toInt())
@@ -42,7 +42,7 @@ class XmlActivity : AppCompatActivity() {
         // COMPACT, MEDIUM, or EXPANDED
         val heightWindowSizeClass = windowSizeClass.windowHeightSizeClass
 
-        Log.d("TAG", "Xml: ${windowSizeClass.toString()}")
+        Log.d("TAG", "Xml: ${windowSizeClass}")
         return widthWindowSizeClass
     }
 }
