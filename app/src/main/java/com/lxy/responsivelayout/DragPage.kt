@@ -1,10 +1,12 @@
 package com.lxy.responsivelayout
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,9 +35,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -43,6 +47,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.burnoutcrew.reorderable.ReorderableItem
+import org.burnoutcrew.reorderable.detectReorderAfterLongPress
+import org.burnoutcrew.reorderable.rememberReorderableLazyListState
+import org.burnoutcrew.reorderable.reorderable
 import kotlin.math.roundToInt
 
 /**
@@ -55,7 +63,7 @@ import kotlin.math.roundToInt
 
 
 val list = listOf("index1", "index2", "index3", "index4", "index5", "index6", "index7")
-val itemHeight = 100
+val itemHeight = 40
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,7 +94,8 @@ fun MainPage() {
         Surface(
             modifier = Modifier.padding(innerPadding)
         ) {
-            DragPage(list = list)
+//            DragPage(list = list)
+            VerticalReorderList()
         }
     }
 }
@@ -121,6 +130,9 @@ fun DragPage(
                     }
                     .padding(4.dp)
                     .fillMaxWidth()
+                    .onGloballyPositioned {
+
+                    }
                     .height(itemHeight.dp)
                     .pointerInput(Unit) {
                         detectDragGestures(
@@ -136,7 +148,7 @@ fun DragPage(
                                 isDragging = false
                                 Log.d("Drag", "移动的项是$it，content = $item")
                                 val newIndex = calculateNewIndex(it, dragOffset)
-                                Log.d("Drag", "移动后的位置是$newIndex，content = $item")
+                                Log.d("Drag", "${it}移动后的位置是$newIndex，content = $item")
                                 if (newIndex != it) {
                                     itemsList = moveItem(itemsList, it, newIndex)
                                 }
@@ -178,4 +190,33 @@ fun moveItem(list: List<String>, oldIndex: Int, newIndex:Int) : List<String>{
     mutableList.add(newIndex, mutableList.removeAt(oldIndex))
 
     return mutableList.toList()
+}
+
+@Composable
+fun VerticalReorderList() {
+    val data = remember { mutableStateOf(List(100) { "Item $it" }) }
+    val state = rememberReorderableLazyListState(onMove = { from, to ->
+        data.value = data.value.toMutableList().apply {
+            add(to.index, removeAt(from.index))
+        }
+    })
+    LazyColumn(
+        state = state.listState,
+        modifier = Modifier
+            .reorderable(state)
+            .detectReorderAfterLongPress(state)
+    ) {
+        items(data.value.size, { it }) { item ->
+            ReorderableItem(state, key = item) { isDragging ->
+                val elevation = animateDpAsState(if (isDragging) 16.dp else 0.dp)
+                Column(
+                    modifier = Modifier
+                        .shadow(elevation.value)
+                        .background(MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(text = "$item")
+                }
+            }
+        }
+    }
 }

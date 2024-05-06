@@ -102,4 +102,5 @@ dependencies {
     implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
 
     implementation("androidx.startup:startup-runtime:1.1.1")
+    implementation("org.burnoutcrew.composereorderable:reorderable:0.9.6")
 }
