@@ -6,10 +6,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -18,7 +18,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,17 +28,19 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,7 +63,7 @@ import kotlin.math.roundToInt
  */
 
 
-val list = listOf("index1", "index2", "index3", "index4", "index5", "index6", "index7")
+val list = listOf("index0","index1", "index2", "index3", "index4", "index5", "index6", "index7")
 val itemHeight = 40
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,8 +95,7 @@ fun MainPage() {
         Surface(
             modifier = Modifier.padding(innerPadding)
         ) {
-//            DragPage(list = list)
-            VerticalReorderList()
+            DragPage(list = list)
         }
     }
 }
@@ -106,7 +106,8 @@ fun DragPage(
 ) {
 
     var itemsList by remember { mutableStateOf(list) }
-
+    val density  = LocalDensity.current.density
+    val heights = remember { mutableStateListOf<Int>() }
 
     LazyColumn(
         modifier = Modifier
@@ -115,73 +116,107 @@ fun DragPage(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
 
-
         items(itemsList.size) {
             val item = itemsList[it]
-            var offsetX by remember { mutableStateOf(0f) }
-            var offsetY by remember { mutableStateOf(0f) }
             var isDragging by remember { mutableStateOf(false) }
             var dragOffset by remember { mutableStateOf(IntOffset.Zero) }
-            Row(
-                modifier = Modifier
-                    .offset {
-                        if (isDragging) dragOffset else IntOffset.Zero
-//                        IntOffset(offsetX.roundToInt(), offsetY.roundToInt())
-                    }
-                    .padding(4.dp)
-                    .fillMaxWidth()
-                    .onGloballyPositioned {
-
-                    }
-                    .height(itemHeight.dp)
-                    .pointerInput(Unit) {
-                        detectDragGestures(
-                            onDragStart = { down ->
-                                isDragging = true
-                                dragOffset = IntOffset.Zero
-                            },
-                            onDrag = { change, dragAmount ->
-//                                change.consume()
-                                dragOffset += IntOffset(0, dragAmount.y.roundToInt())
-                            },
-                            onDragEnd = {
-                                isDragging = false
-                                Log.d("Drag", "移动的项是$it，content = $item")
-                                val newIndex = calculateNewIndex(it, dragOffset)
-                                Log.d("Drag", "${it}移动后的位置是$newIndex，content = $item")
-                                if (newIndex != it) {
-                                    itemsList = moveItem(itemsList, it, newIndex)
-                                }
-                            }
-                        )
-                    },
-                verticalAlignment = Alignment.CenterVertically,
-
-                ) {
-
-                Image(
-                    painter = painterResource(id = R.drawable.login_icon_person),
+            val height = DynamicHeightItem{
+                Row(
                     modifier = Modifier
-                        .size(width = 48.dp, height = 48.dp)
-                        .clip(RoundedCornerShape(6.dp)),
-                    contentDescription = ""
-                )
-                Text(
-                    text = "$item",
-                    fontSize = 14.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(6.dp)
-                )
+                        .offset {
+                            if (isDragging) dragOffset else IntOffset.Zero
+                        }
+                        .padding(4.dp)
+                        .fillMaxWidth()
+                        .onGloballyPositioned {
+
+                        }
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDragStart = { down ->
+                                    isDragging = true
+                                    dragOffset = IntOffset.Zero
+                                },
+                                onDrag = { change, dragAmount ->
+//                                change.consume()
+                                    dragOffset += IntOffset(0, dragAmount.y.roundToInt())
+                                },
+                                onDragEnd = {
+                                    isDragging = false
+                                    Log.d("Drag", "移动的项是$it，content = $item")
+                                    val newIndex = calculateNewIndex(it, dragOffset, heights)
+                                    Log.d("Drag", "${it}移动后的位置是$newIndex，content = $item")
+                                    if (newIndex != it) {
+                                        itemsList = moveItem(itemsList, it, newIndex)
+                                    }
+                                }
+                            )
+                        },
+                    verticalAlignment = Alignment.CenterVertically,
+
+                    ) {
+
+                    Image(
+                        painter = painterResource(id = R.drawable.login_icon_person),
+                        modifier = Modifier
+                            .size(width = 48.dp, height = 48.dp)
+                            .clip(RoundedCornerShape(6.dp)),
+                        contentDescription = ""
+                    )
+                    Text(
+                        text = "$item",
+                        fontSize = 14.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(6.dp)
+                    )
+                }
             }
+
+            heights.add(height)
         }
 
     }
 }
-fun calculateNewIndex(draggedItemIndex: Int, dragOffset: IntOffset): Int {
-    val draggedItemY = draggedItemIndex * itemHeight // 假设每个子项的高度相等
-    val draggedItemCenterY = draggedItemY + (itemHeight / 2)
-    val newIndex = (draggedItemCenterY + dragOffset.y) / itemHeight
+
+@Composable
+fun DynamicHeightItem(content: @Composable () -> Unit): Int {
+    var height by remember { mutableStateOf(0) }
+
+    Box(
+        modifier = Modifier
+            .layout { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                height = placeable.height
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+            .onGloballyPositioned { coordinates ->
+                height = coordinates.size.height
+            }
+    ) {
+        content()
+    }
+
+    Log.d("TAG", "DynamicHeightItem: $height")
+    return height
+}
+
+fun calculateNewIndex(draggedItemIndex: Int, dragOffset: IntOffset, heights: List<Int>): Int {
+
+    // 计算当前拖动项的原始高度
+    // 得到拖动后的高度
+    // 得到拖动后的位置属于哪一项
+    var draggedItemY = 0
+    for(0...draggedItemIndex){
+        
+    }
+
+    val height = (itemHeight * density).toInt()
+    val draggedItemY = draggedItemIndex * height // 假设每个子项的高度相等
+    val draggedItemCenterY = draggedItemY + (height / 2)
+    val newIndex = (draggedItemCenterY + dragOffset.y) / height
     return newIndex.coerceIn(0, list.size - 1)
 }
 
