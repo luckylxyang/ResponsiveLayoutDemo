@@ -39,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -111,7 +112,7 @@ fun DragPage(
     var itemsList by remember { mutableStateOf(list) }
     val heights = remember { mutableStateListOf<Int>() }
     val density = LocalDensity.current.density
-
+    var isDragging by remember { mutableStateOf(false) }
     LazyColumn(
         modifier = Modifier
             .background(colorResource(id = R.color.white))
@@ -121,7 +122,6 @@ fun DragPage(
 
         items(itemsList.size) {
             val item = itemsList[it]
-            var isDragging by remember { mutableStateOf(false) }
             var dragOffset by remember { mutableStateOf(IntOffset.Zero) }
             Column(
                 modifier = Modifier
@@ -131,17 +131,17 @@ fun DragPage(
                     .height(itemHeight.dp)
                     .padding(4.dp)
                     .fillMaxWidth()
-                    .onGloballyPositioned {
-
-                    }
                     .pointerInput(Unit) {
                         detectDragGestures(
                             onDragStart = { down ->
+                                if (isDragging){
+                                    return@detectDragGestures
+                                }
                                 isDragging = true
                                 dragOffset = IntOffset.Zero
                             },
                             onDrag = { change, dragAmount ->
-                                change.consume()
+                                change.consumePositionChange()
                                 dragOffset += IntOffset(0, dragAmount.y.roundToInt())
                             },
                             onDragEnd = {

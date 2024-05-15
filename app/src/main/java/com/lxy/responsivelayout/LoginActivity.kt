@@ -18,11 +18,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
+import com.lxy.responsivelayout.gesture.GestureDragPage
 import com.lxy.responsivelayout.list.ListActivity
 import com.lxy.responsivelayout.main.MainActivity
 import com.lxy.responsivelayout.ui.theme.ResponsiveLayoutTheme
@@ -41,7 +40,8 @@ class LoginActivity : ComponentActivity() {
                 ) {
 //                    val windowSizeClass = calculateWindowSizeClass(this)
 //                    Greeting(windowSizeClass)
-                    MainPage()
+//                    MainPage()
+                    GestureDragPage()
                 }
             }
         }
