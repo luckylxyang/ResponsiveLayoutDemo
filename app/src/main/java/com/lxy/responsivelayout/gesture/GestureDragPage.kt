@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
@@ -73,48 +74,49 @@ fun GestureDragPage() {
         Surface(
             modifier = Modifier.padding(innerPadding)
         ) {
-            GestureLock()
+            GestureLock(Modifier.fillMaxSize())
         }
     }
 }
 
 @Composable
 fun GestureLock(
-    drawEnd: ((List<Int>) -> Unit?)? = null,
+    modifier: Modifier = Modifier,
+    drawStart: (() -> Unit)? = null,
+    drawEnd: ((List<Int>) -> Unit)? = null,
     selectColor : Color = Color.Blue,
-    defaultColor : Color = Color.Gray
+    defaultColor : Color = Color.Gray,
+    circleRadius: Int = 30
 ) {
     var path by remember { mutableStateOf(Path()) }
     val points = remember { mutableStateListOf<Offset>() }
     val selectedCircles = remember { mutableStateListOf<Int>() }
-    val circleRadius = with(LocalDensity.current) { 30.dp.toPx() }
+    val circleRadiusPx = with(LocalDensity.current) { circleRadius.dp.toPx() }
     val circleMargin = with(LocalDensity.current) { 40.dp.toPx() }
-    var verificationResult by remember { mutableStateOf(false) }
-    var text by remember { mutableStateOf("") }
-
-    // 定义正确的路径顺序
-    val correctPattern = listOf(0, 1, 2, 5, 8)
 
     Box(
-        modifier = Modifier
+        contentAlignment = Alignment.Center,
+        modifier = modifier
             .fillMaxSize()
             .padding(16.dp)
-            .background(Color.White)
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { offset ->
-                        val index = detectCircle(offset, circleRadius, circleMargin)
+                        val index = detectCircle(offset, circleRadiusPx, circleMargin)
                         if (index != -1 && !selectedCircles.contains(index)) {
                             selectedCircles.add(index)
-                            points.add(getCircleCenter(index, circleRadius, circleMargin))
+                            points.add(getCircleCenter(index, circleRadiusPx, circleMargin))
                             path = updatePath(points)
+                        }
+                        if (drawStart != null){
+                            drawStart()
                         }
                     },
                     onDrag = { change, _ ->
-                        val index = detectCircle(change.position, circleRadius, circleMargin)
+                        val index = detectCircle(change.position, circleRadiusPx, circleMargin)
                         if (index != -1 && !selectedCircles.contains(index)) {
                             selectedCircles.add(index)
-                            points.add(getCircleCenter(index, circleRadius, circleMargin))
+                            points.add(getCircleCenter(index, circleRadiusPx, circleMargin))
                         }
                         if (points.isNotEmpty()) {
                             path = updatePath(points)
@@ -122,29 +124,24 @@ fun GestureLock(
                         }
                     },
                     onDragEnd = {
-                        verificationResult = validatePattern(selectedCircles, correctPattern)
-                        text = if (!verificationResult){
-                            "Pattern does not match"
-                        } else {
-                            "Pattern does match"
-                        }
-                        if (drawEnd != null){
+
+                        if (drawEnd != null && points.isNotEmpty()){
                             drawEnd(selectedCircles)
                         }
                         points.clear()
                         selectedCircles.clear()
-                        path = Path() // Reset the path
+                        path = Path()
                     }
                 )
             }
     ) {
-        Canvas(modifier = Modifier.fillMaxSize()) {
+        Canvas(modifier = Modifier.fillMaxSize().align(Alignment.Center)) {
             for (i in 0..8) {
-                val center = getCircleCenter(i, circleRadius, circleMargin)
+                val center = getCircleCenter(i, circleRadiusPx, circleMargin)
                 val isSelect = selectedCircles.contains(i)
                 drawCircle(
                     color = if (!isSelect) defaultColor else selectColor,
-                    radius = circleRadius,
+                    radius = circleRadiusPx,
                     center = center,
                     style = Stroke(width = 2.dp.toPx())
                 )
@@ -156,18 +153,10 @@ fun GestureLock(
                 style = Stroke(width = 2.dp.toPx())
             )
         }
-
-
-        Text(
-            text = text,
-            color = Color.Red,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
-
     }
 }
 
-fun detectCircle(offset: Offset, circleRadius: Float, circleMargin: Float): Int {
+private fun detectCircle(offset: Offset, circleRadius: Float, circleMargin: Float): Int {
     for (i in 0..8) {
         val center = getCircleCenter(i, circleRadius, circleMargin)
         if (offset.dst(center) <= circleRadius) {
@@ -177,7 +166,7 @@ fun detectCircle(offset: Offset, circleRadius: Float, circleMargin: Float): Int 
     return -1
 }
 
-fun getCircleCenter(index: Int, circleRadius: Float, circleMargin: Float): Offset {
+private fun getCircleCenter(index: Int, circleRadius: Float, circleMargin: Float): Offset {
     val row = index / 3
     val col = index % 3
     return Offset(
@@ -186,11 +175,11 @@ fun getCircleCenter(index: Int, circleRadius: Float, circleMargin: Float): Offse
     )
 }
 
-fun Offset.dst(other: Offset): Float {
+private fun Offset.dst(other: Offset): Float {
     return kotlin.math.sqrt((x - other.x) * (x - other.x) + (y - other.y) * (y - other.y))
 }
 
-fun updatePath(points: List<Offset>): Path {
+private fun updatePath(points: List<Offset>): Path {
     val path = Path()
     if (points.isNotEmpty()) {
         path.moveTo(points[0].x, points[0].y)
@@ -199,16 +188,4 @@ fun updatePath(points: List<Offset>): Path {
         }
     }
     return path
-}
-
-fun validatePattern(selectedCircles: List<Int>, correctPattern: List<Int>): Boolean {
-    if (selectedCircles.size != correctPattern.size) {
-        return false
-    }
-    for (i in selectedCircles.indices) {
-        if (selectedCircles[i] != correctPattern[i]) {
-            return false
-        }
-    }
-    return true
 }

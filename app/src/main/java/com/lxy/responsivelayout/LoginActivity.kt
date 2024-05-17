@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,9 +22,13 @@ import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.ViewModelProvider
+import com.lxy.responsivelayout.addressbook.ContactsScreen
 import com.lxy.responsivelayout.gesture.GestureDragPage
 import com.lxy.responsivelayout.list.ListActivity
 import com.lxy.responsivelayout.main.MainActivity
+import com.lxy.responsivelayout.network.NetworkDiagnosticScreen
+import com.lxy.responsivelayout.network.NetworkDiagnosticViewModel
 import com.lxy.responsivelayout.ui.theme.ResponsiveLayoutTheme
 
 class LoginActivity : ComponentActivity() {
@@ -41,13 +46,17 @@ class LoginActivity : ComponentActivity() {
 //                    val windowSizeClass = calculateWindowSizeClass(this)
 //                    Greeting(windowSizeClass)
 //                    MainPage()
-                    GestureDragPage()
+//                    GestureDragPage()
+//                    NetworkDiagnosticScreen()
+                    ContactsScreen()
                 }
             }
         }
 
     }
 }
+
+
 
 
 @Composable

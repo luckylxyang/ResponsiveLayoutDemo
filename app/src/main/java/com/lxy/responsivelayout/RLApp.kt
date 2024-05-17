@@ -24,7 +24,7 @@ class RLApp : Application() {
 //            .initializeComponent(InitProvider::class.java)
 
 
-        var init = AutoSize.checkInit()
+        val init = AutoSize.checkInit()
         Log.d("TAG", "onCreate autosize init: $init")
     }
 }
