@@ -1,5 +1,7 @@
 package com.lxy.responsivelayout.addressbook
 
+import net.sourceforge.pinyin4j.PinyinHelper
+
 /**
  *
  * @Author：liuxy
@@ -7,4 +9,12 @@ package com.lxy.responsivelayout.addressbook
  * @Desc：
  *
  */
-data class Contact(val name: String)
+data class Contact(
+    val name: String,
+    val pinyin: String = ""
+)
+
+fun String.toPinyin(): String {
+    val pinyinArray = PinyinHelper.toHanyuPinyinStringArray(this[0])
+    return pinyinArray?.firstOrNull()?.substring(0, 1)?.toUpperCase() ?: this
+}
