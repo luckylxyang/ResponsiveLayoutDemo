@@ -5,6 +5,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -32,6 +33,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -39,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
@@ -46,6 +49,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
@@ -62,26 +66,6 @@ import kotlin.math.roundToInt
  *
  */
 
-val oftenMenus = listOf(
-    MiniAppEntity("App1"),
-    MiniAppEntity("App2"),
-    MiniAppEntity("App3"),
-    MiniAppEntity("App4"),
-    MiniAppEntity("App5"),
-    MiniAppEntity("App6"),
-    MiniAppEntity("App7")
-)
-
-val otherMenus = listOf(
-    MiniAppEntity("App1"),
-    MiniAppEntity("App2"),
-    MiniAppEntity("App3"),
-    MiniAppEntity("App4"),
-    MiniAppEntity("App5"),
-    MiniAppEntity("App6"),
-    MiniAppEntity("App7")
-)
-
 @Composable
 fun GroupTitle(groupName: String, modifier: Modifier = Modifier) {
     Text(
@@ -94,9 +78,10 @@ fun GroupTitle(groupName: String, modifier: Modifier = Modifier) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeEditScreenPage(
-//    viewModel: HomeViewModel = viewModel()
+    mViewModel: HomeViewModel = viewModel()
 ) {
-//    val oftenMenus = viewModel.oftenMenus.collectAsState()
+    val oftenMenus = mViewModel.oftenMenus.collectAsState().value
+    val otherMenus = mViewModel.otherMenus.collectAsState().value
     val height = remember {
         if (oftenMenus.size % 4 == 0) {
             oftenMenus.size / 4 * 100
@@ -126,11 +111,18 @@ fun HomeEditScreenPage(
             }
 
             items(oftenMenus.size) {
-                OftenMenuItem(height = height, item = oftenMenus[it], index = it)
+                OftenMenuItem(height = height, item = oftenMenus[it], index = it, oftenMenus = oftenMenus)
             }
 
             item {
-                otherMenus()
+                otherMenus(
+                    list = otherMenus,
+                    hiddenClick = { /*TODO*/ },
+                    addToOften = {
+                        mViewModel.addOftenMenus(it)
+                    }) {
+                    mViewModel.removeOftenMenus(it)
+                }
             }
 
         }
@@ -189,19 +181,25 @@ fun TopBar() {
 
 @Composable
 fun otherMenus(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    list: List<MiniAppEntity>,
+    hiddenClick: () -> Unit,
+    addToOften: (MiniAppEntity) -> Unit,
+    removeToOften: (Int) -> Unit,
 ){
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding()
+            .background(color = Color.White, shape = RoundedCornerShape(6.dp))
+            .padding(6.dp, 12.dp)
     ) {
-        Text(text = otherMenus.first().name)
+        Text(text = list.first().name, fontSize = 14.sp,
+            modifier = Modifier.padding(start = 5.dp))
 
-        otherMenus.forEach {
-            MenuItem(item = it, hiddenClick = { /*TODO*/ }, addToOften = { /*TODO*/ }) {
-
-            }
+        list.forEachIndexed { index, entity ->
+            MenuItem(item = entity, hiddenClick = hiddenClick, addToOften = { addToOften(entity) }, removeToOften = {
+                removeToOften(index)
+            })
         }
     }
 }
@@ -210,7 +208,8 @@ fun otherMenus(
 fun OftenMenuItem(
     height: Int,
     item: MiniAppEntity,
-    index: Int
+    index: Int,
+    oftenMenus : List<MiniAppEntity>
 ) {
 
     val density = LocalDensity.current.density
@@ -223,6 +222,13 @@ fun OftenMenuItem(
             }
             .padding(4.dp)
             .fillMaxWidth()
+            .pointerInput(Unit) {
+                detectTapGestures(
+                    onLongPress = {
+                        isDragging = true
+                    }
+                )
+            }
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { down ->
@@ -254,7 +260,7 @@ fun OftenMenuItem(
     ) {
 
         Image(
-            painter = painterResource(id = R.mipmap.ic_launcher),
+            painter = painterResource(id = R.drawable.login_icon_person),
             modifier = Modifier
                 .size(width = 48.dp, height = 48.dp)
                 .clip(RoundedCornerShape(6.dp)),
@@ -278,14 +284,26 @@ fun MenuItem(
     addToOften: () -> Unit,
     removeToOften: () -> Unit,
 ) {
-    Row {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 3.dp, horizontal = 5.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
         Image(
             modifier = Modifier.size(30.dp),
-            painter = painterResource(id = R.mipmap.ic_launcher),
+            painter = painterResource(id = R.drawable.login_icon_person),
             contentDescription = null
         )
-        Text(text = item.name)
+        Text(modifier = Modifier
+            .weight(1f)
+            .padding(horizontal = 8.dp),text = item.name)
 
+        val text = if (item.isOften) {
+            "从常用中移除"
+        } else {
+            "添加至常用"
+        }
         AssistChip(
             onClick = {
                 if (item.isOften) {
@@ -294,7 +312,7 @@ fun MenuItem(
                     addToOften()
                 }
             },
-            label = { Text("Assist chip") },
+            label = { Text(text) },
             leadingIcon = {
                 Icon(
                     Icons.Filled.Add,
@@ -314,6 +332,7 @@ fun MenuItem(
             contentDescription = "Localized description",
             Modifier
                 .size(AssistChipDefaults.IconSize)
+                .padding(start = 5.dp)
                 .clickable {
                     hiddenClick()
                 }
