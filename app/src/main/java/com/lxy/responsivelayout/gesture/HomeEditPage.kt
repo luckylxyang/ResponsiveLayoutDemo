@@ -1,6 +1,9 @@
 package com.lxy.responsivelayout.gesture
 
 import androidx.activity.ComponentActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -28,6 +31,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
@@ -82,6 +86,8 @@ fun HomeEditScreenPage(
 ) {
     val oftenMenus = mViewModel.oftenMenus.collectAsState().value
     val otherMenus = mViewModel.otherMenus.collectAsState().value
+    val hideMenus = mViewModel.hideMenus.collectAsState().value
+    var isSearchVisible by remember { mutableStateOf(false) }
     val height = remember {
         if (oftenMenus.size % 4 == 0) {
             oftenMenus.size / 4 * 100
@@ -93,8 +99,41 @@ fun HomeEditScreenPage(
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-        topBar = { TopBar() },
+        topBar = { TopBar(
+            onSearch = {isSearchVisible = true}
+        ) },
     ) { innerPadding ->
+        AnimatedVisibility(
+            visible = isSearchVisible,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ){
+            val searchResult = mViewModel.searchResult.collectAsState().value
+            HomeEditSearchDialog(
+                onDismissRequest = {
+                    mViewModel.clearSearchResult()
+                    isSearchVisible = false },
+                onSearch = {
+                    mViewModel.searchMiniApp(it)
+                },
+                menuList = searchResult
+            ){
+                MenuItem(
+                    item = it,
+                    hiddenClick = {
+                        if (it.isHidden) {
+                            mViewModel.removeHideMenus(it)
+                        } else {
+                            mViewModel.addToHideMenus(it)
+                        }
+                    },
+                    addToOften = {
+                        mViewModel.addOftenMenus(it)
+                    }) {
+                    mViewModel.removeOftenMenus(it)
+                }
+            }
+        }
         LazyColumn(
             modifier = Modifier
                 .background(colorResource(id = R.color.bg))
@@ -111,13 +150,39 @@ fun HomeEditScreenPage(
             }
 
             items(oftenMenus.size) {
-                OftenMenuItem(height = height, item = oftenMenus[it], index = it, oftenMenus = oftenMenus)
+                OftenMenuItem(
+                    height = height,
+                    item = oftenMenus[it],
+                    index = it,
+                    oftenMenus = oftenMenus
+                )
+            }
+
+            items(otherMenus.size) { index ->
+                val subList = otherMenus[index]
+                otherMenus(
+                    list = subList,
+                    hiddenClick = {
+                        val item = subList[it]
+                        if (item.isHidden) {
+                            mViewModel.removeHideMenus(it)
+                        } else {
+                            mViewModel.addToHideMenus(item)
+                        }
+                    },
+                    addToOften = {
+                        mViewModel.addOftenMenus(it)
+                    }) {
+                    mViewModel.removeOftenMenus(it)
+                }
             }
 
             item {
                 otherMenus(
-                    list = otherMenus,
-                    hiddenClick = { /*TODO*/ },
+                    list = hideMenus,
+                    hiddenClick = {
+                        mViewModel.removeHideMenus(it)
+                    },
                     addToOften = {
                         mViewModel.addOftenMenus(it)
                     }) {
@@ -131,7 +196,9 @@ fun HomeEditScreenPage(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBar() {
+fun TopBar(
+    onSearch : ()->Unit
+) {
 
 
     val context = LocalContext.current
@@ -161,7 +228,7 @@ fun TopBar() {
         actions = {
             IconButton(
                 onClick = {
-
+                    onSearch()
                 }
             ) {
                 Icon(Icons.Filled.Search, null)
@@ -183,23 +250,29 @@ fun TopBar() {
 fun otherMenus(
     modifier: Modifier = Modifier,
     list: List<MiniAppEntity>,
-    hiddenClick: () -> Unit,
+    hiddenClick: (Int) -> Unit,
     addToOften: (MiniAppEntity) -> Unit,
     removeToOften: (Int) -> Unit,
-){
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .background(color = Color.White, shape = RoundedCornerShape(6.dp))
             .padding(6.dp, 12.dp)
     ) {
-        Text(text = list.first().name, fontSize = 14.sp,
-            modifier = Modifier.padding(start = 5.dp))
+        Text(
+            text = list.first().name, fontSize = 14.sp,
+            modifier = Modifier.padding(start = 5.dp)
+        )
 
         list.forEachIndexed { index, entity ->
-            MenuItem(item = entity, hiddenClick = hiddenClick, addToOften = { addToOften(entity) }, removeToOften = {
-                removeToOften(index)
-            })
+            MenuItem(
+                item = entity,
+                hiddenClick = { hiddenClick(index) },
+                addToOften = { addToOften(entity) },
+                removeToOften = {
+                    removeToOften(index)
+                })
         }
     }
 }
@@ -209,7 +282,7 @@ fun OftenMenuItem(
     height: Int,
     item: MiniAppEntity,
     index: Int,
-    oftenMenus : List<MiniAppEntity>
+    oftenMenus: List<MiniAppEntity>
 ) {
 
     val density = LocalDensity.current.density
@@ -295,9 +368,11 @@ fun MenuItem(
             painter = painterResource(id = R.drawable.login_icon_person),
             contentDescription = null
         )
-        Text(modifier = Modifier
-            .weight(1f)
-            .padding(horizontal = 8.dp),text = item.name)
+        Text(
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp), text = item.name
+        )
 
         val text = if (item.isOften) {
             "从常用中移除"
@@ -340,7 +415,12 @@ fun MenuItem(
     }
 }
 
-fun calculateNewIndex(
+@Composable
+private fun Model(){
+
+}
+
+private fun calculateNewIndex(
     draggedItemIndex: Int,
     dragOffset: IntOffset,
     density: Float,

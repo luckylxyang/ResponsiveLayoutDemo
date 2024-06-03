@@ -30,13 +30,30 @@ private val otherMenu = listOf(
     MiniAppEntity("App6"),
     MiniAppEntity("App7")
 )
+
+private val hideMenu = listOf(
+    MiniAppEntity("App1"),
+    MiniAppEntity("App2"),
+)
+
+private val allMenu = listOf(
+    otherMenu,
+    otherMenu
+)
+
 class HomeViewModel : ViewModel() {
 
     private val _oftenMenus = MutableStateFlow(oftenMenu)
     val oftenMenus : StateFlow<List<MiniAppEntity>> = _oftenMenus
 
-    private val _otherMenus = MutableStateFlow(otherMenu)
-    val otherMenus : StateFlow<List<MiniAppEntity>> = _otherMenus
+    private val _otherMenus = MutableStateFlow(allMenu)
+    val otherMenus : StateFlow<List<List<MiniAppEntity>>> = _otherMenus
+
+    private val _hideMenus = MutableStateFlow(hideMenu)
+    val hideMenus : StateFlow<List<MiniAppEntity>> = _hideMenus
+
+    private val _searchResult = MutableStateFlow(emptyList<MiniAppEntity>())
+    val searchResult : StateFlow<List<MiniAppEntity>> = _searchResult
 
     fun addOftenMenus(item: MiniAppEntity){
         _oftenMenus.update {
@@ -51,6 +68,58 @@ class HomeViewModel : ViewModel() {
             val toMutableList = it.toMutableList()
             toMutableList.removeAt(index)
             toMutableList
+        }
+    }
+
+    fun removeOftenMenus(item : MiniAppEntity){
+        _oftenMenus.update {
+            val toMutableList = it.toMutableList()
+            toMutableList.remove(item)
+            toMutableList
+        }
+    }
+
+    fun addToHideMenus(item : MiniAppEntity){
+        _hideMenus.update {
+            val toMutableList = it.toMutableList()
+            toMutableList.add(item)
+            toMutableList
+        }
+    }
+
+    fun removeHideMenus(index : Int){
+        _hideMenus.update {
+            val toMutableList = it.toMutableList()
+            toMutableList.removeAt(index)
+            toMutableList
+        }
+    }
+
+    fun removeHideMenus(item : MiniAppEntity){
+        _hideMenus.update {
+            val toMutableList = it.toMutableList()
+            toMutableList.remove(item)
+            toMutableList
+        }
+    }
+
+    fun searchMiniApp(search : String){
+        val result = mutableListOf<MiniAppEntity>()
+        allMenu.forEach { entityList ->
+            entityList.forEach{
+                if (it.name.contains(search)){
+                    result.add(it)
+                }
+            }
+        }
+        _searchResult.update {
+            result
+        }
+    }
+
+    fun clearSearchResult() {
+        _searchResult.update {
+            emptyList()
         }
     }
 }
