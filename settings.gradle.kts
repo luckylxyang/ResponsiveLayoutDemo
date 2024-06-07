@@ -3,6 +3,8 @@ import java.net.URI
 
 pluginManagement {
     repositories {
+        maven ("https://maven.aliyun.com/repository/public")
+        maven ("https://maven.aliyun.com/repository/gradle-plugin")
         google()
         mavenCentral()
         gradlePluginPortal()
@@ -11,6 +13,9 @@ pluginManagement {
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
+        maven { url = URI("https://maven.aliyun.com/repository/central") }
+        maven { url = URI("https://maven.aliyun.com/repository/public")}
+        maven { url = URI("https://maven.aliyun.com/repository/gradle-plugin") }
         google()
         mavenCentral()
         maven { url = URI("https://jitpack.io") }

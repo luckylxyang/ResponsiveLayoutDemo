@@ -26,6 +26,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.lxy.responsivelayout.addressbook.ContactsScreen
 import com.lxy.responsivelayout.gesture.GestureDragPage
 import com.lxy.responsivelayout.gesture.HomeEditScreenPage
+import com.lxy.responsivelayout.gesture.LazyGridDragAndDropDemo
 import com.lxy.responsivelayout.list.ListActivity
 import com.lxy.responsivelayout.main.MainActivity
 import com.lxy.responsivelayout.network.NetworkDiagnosticScreen
@@ -50,7 +51,8 @@ class LoginActivity : ComponentActivity() {
 //                    GestureDragPage()
 //                    NetworkDiagnosticScreen()
 //                    ContactsScreen()
-                    HomeEditScreenPage()
+//                    HomeEditScreenPage()
+                    LazyGridDragAndDropDemo()
                 }
             }
         }

@@ -1,7 +1,7 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+//    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -41,9 +41,9 @@ android {
         compose = true
         viewBinding = true
     }
-//    composeOptions {
-//        kotlinCompilerExtensionVersion = "1.4.3"
-//    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.4.3"
+    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -52,12 +52,6 @@ android {
 }
 
 
-//composeCompiler {
-//    enableStrongSkippingMode = true
-//
-////    reportsDestination = layout.buildDirectory.dir("compose_compiler")
-////    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
-//}
 
 dependencies {
 
