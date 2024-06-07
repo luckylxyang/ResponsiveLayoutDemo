@@ -8,6 +8,7 @@ package com.lxy.responsivelayout.gesture
  *
  */
 data class MiniAppEntity(
+    val id : String = "",
     val name : String,
     var isOften : Boolean = false,
     var isHidden : Boolean = false

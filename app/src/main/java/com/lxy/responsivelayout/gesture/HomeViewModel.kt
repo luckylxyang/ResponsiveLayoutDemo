@@ -16,24 +16,24 @@ import kotlinx.coroutines.launch
  *
  */
 private val oftenMenu = listOf(
-    MiniAppEntity("App1"),
-    MiniAppEntity("App2"),
-    MiniAppEntity("App3")
+    MiniAppEntity("1a","App1"),
+    MiniAppEntity("2a","App2"),
+    MiniAppEntity("3a","App3")
 )
 
 private val otherMenu = listOf(
-    MiniAppEntity("App1"),
-    MiniAppEntity("App2"),
-    MiniAppEntity("App3"),
-    MiniAppEntity("App4"),
-    MiniAppEntity("App5"),
-    MiniAppEntity("App6"),
-    MiniAppEntity("App7")
+    MiniAppEntity("4a","App1"),
+    MiniAppEntity("5a","App2"),
+    MiniAppEntity("6a","App3"),
+    MiniAppEntity("7a","App4"),
+    MiniAppEntity("8a","App5"),
+    MiniAppEntity("9a","App6"),
+    MiniAppEntity("10a","App7")
 )
 
 private val hideMenu = listOf(
-    MiniAppEntity("App1"),
-    MiniAppEntity("App2"),
+    MiniAppEntity("11a","App1"),
+    MiniAppEntity("12a","App2"),
 )
 
 private val allMenu = listOf(

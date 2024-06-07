@@ -63,30 +63,84 @@ import kotlinx.coroutines.launch
 fun LazyGridDragAndDropDemo() {
     var list by remember { mutableStateOf(List(50) { it }) }
 
-    val gridState = rememberLazyGridState()
-    val dragDropState =
-        rememberGridDragDropState(gridState) { fromIndex, toIndex ->
+    DraggableVerticalGrid(
+        list,
+        itemKey = {_,item->
+            item
+        },
+        onMove = { fromIndex, toIndex ->
             list = list.toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
-        }
-
-    LazyVerticalGrid(
+        },
         columns = GridCells.Fixed(3),
-        modifier = Modifier.dragContainer(dragDropState),
-        state = gridState,
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ){ item, isDragging ->
+        val elevation by animateDpAsState(if (isDragging) 4.dp else 1.dp, label = "")
+        Card(elevation = CardDefaults.cardElevation(elevation)) {
+            Text(
+                "Item $item",
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp)
+            )
+        }
+    }
+
+//    LazyVerticalGrid(
+//        modifier = Modifier.dragContainer(dragDropState),
+//        state = gridState,
+//        columns = GridCells.Fixed(3),
+//        contentPadding = PaddingValues(16.dp),
+//        verticalArrangement = Arrangement.spacedBy(16.dp),
+//        horizontalArrangement = Arrangement.spacedBy(16.dp),
+//    ) {
+//        itemsIndexed(list, key = { _, item -> item }) { index, item ->
+//            DraggableItem(dragDropState, index) { isDragging ->
+//                val elevation by animateDpAsState(if (isDragging) 4.dp else 1.dp, label = "")
+//                Card(elevation = CardDefaults.cardElevation(elevation)) {
+//                    Text(
+//                        "Item $item",
+//                        textAlign = TextAlign.Center,
+//                        modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp)
+//                    )
+//                }
+//            }
+//        }
+//    }
+}
+
+@Composable
+fun <T : Any> DraggableVerticalGrid(
+    list: List<T>,
+    columns : GridCells,
+    modifier : Modifier = Modifier,
+    contentPadding : PaddingValues = PaddingValues(16.dp),
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
+    itemKey:(Int,T) -> Any,
+    onMove: (Int, Int) -> Unit,
+    content: @Composable (T, Boolean) -> Unit,
+){
+    val gridState = rememberLazyGridState()
+    val dragDropState =
+        rememberGridDragDropState(gridState) { fromIndex, toIndex ->
+            onMove(fromIndex, toIndex)
+        }
+
+    LazyVerticalGrid(
+        columns = columns,
+        modifier = Modifier.dragContainer(dragDropState).then(modifier),
+        state = gridState,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        verticalArrangement = verticalArrangement,
+        horizontalArrangement = horizontalArrangement,
     ) {
-        itemsIndexed(list, key = { _, item -> item }) { index, item ->
+        itemsIndexed(list, key = { index, item -> itemKey(index, item) }) { index, item ->
             DraggableItem(dragDropState, index) { isDragging ->
-                val elevation by animateDpAsState(if (isDragging) 4.dp else 1.dp, label = "")
-                Card(elevation = CardDefaults.cardElevation(elevation)) {
-                    Text(
-                        "Item $item",
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 40.dp)
-                    )
-                }
+                content(list[index], isDragging)
             }
         }
     }
