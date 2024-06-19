@@ -21,8 +21,8 @@ private val oftenMenu = listOf(
     MiniAppEntity("3a","App3")
 )
 
-private val otherMenu = listOf(
-    MiniAppEntity("4a","App1"),
+val otherMenu = listOf(
+    MiniAppEntity("4a","App133234多发点撒"),
     MiniAppEntity("5a","App2"),
     MiniAppEntity("6a","App3"),
     MiniAppEntity("7a","App4"),
@@ -36,8 +36,8 @@ private val hideMenu = listOf(
     MiniAppEntity("12a","App2"),
 )
 
-private val allMenu = listOf(
-    otherMenu,
+var allMenu = listOf(
+    oftenMenu,
     otherMenu
 )
 
@@ -120,6 +120,13 @@ class HomeViewModel : ViewModel() {
     fun clearSearchResult() {
         _searchResult.update {
             emptyList()
+        }
+    }
+
+    fun onMove(fromIndex : Int, toIndex : Int, all : Int){
+        allMenu = allMenu.toMutableList().apply {
+            val list = allMenu[all].toMutableList().apply { add(toIndex, removeAt(fromIndex)) }
+            add(all, list)
         }
     }
 }

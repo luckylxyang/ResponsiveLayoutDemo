@@ -57,11 +57,6 @@
             android:label="@string/title_activity_login"
             android:theme="@style/Theme.ResponsiveLayout">
 
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".main.MainActivity"
@@ -72,6 +67,17 @@
         <activity android:name="com.lxy.responsivelayout.feedback.FeedbackDetailActivity"
             android:theme="@style/Theme.ResponsiveLayout"
             android:exported="true" >
+        </activity>
+        <activity android:name="com.lxy.responsivelayout.search.SearchActivity"
+
+            android:theme="@style/Theme.XML"
+            android:exported="true">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 

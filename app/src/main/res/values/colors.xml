@@ -9,4 +9,38 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bg">#eeeff2</color>
     <color name="page_bg">#eeeff2</color>
+
+    <!-- res/values/colors.xml -->
+    <!-- Common Colors -->
+    <color name="primaryColor">#4285F4</color>
+    <color name="primaryDarkColor">#3367D6</color>
+    <color name="primaryLightColor">#63A4FF</color>
+    <color name="secondaryColor">#FFA726</color>
+    <color name="backgroundColor">#F5F5F5</color>
+    <color name="surfaceColor">#FFFFFF</color>
+    <color name="errorColor">#F44336</color>
+    <color name="textPrimaryColor">#000000</color>
+    <color name="textSecondaryColor">#757575</color>
+    <color name="textOnPrimaryColor">#FFFFFF</color>
+    <color name="iconBackgroundColorBlue">#4285F4</color>
+    <color name="iconBackgroundColorOrange">#FFA726</color>
+
+    <!-- Specific Colors for Different Screens -->
+    <!-- 工作台 -->
+    <color name="dashboardBackgroundColor">#F5F5F5</color>
+    <color name="dashboardNavBarColor">#4285F4</color>
+    <color name="dashboardIconBackgroundBlue">#4285F4</color>
+    <color name="dashboardIconBackgroundOrange">#FFA726</color>
+
+    <!-- 历史记录 -->
+    <color name="historyBackgroundColor">#FFFFFF</color>
+    <color name="historyNavBarColor">#4285F4</color>
+    <color name="historyDeleteButtonColor">#F44336</color>
+
+    <!-- 登录页 -->
+    <color name="loginBackgroundColor">#F5F5F5</color>
+    <color name="loginNavBarColor">#4285F4</color>
+    <color name="loginButtonColor">#4285F4</color>
+    <color name="loginErrorTextColor">#F44336</color>
+
 </resources>

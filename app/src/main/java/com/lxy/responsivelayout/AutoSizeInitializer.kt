@@ -14,7 +14,7 @@ import me.jessyan.autosize.AutoSize
  */
 class AutoSizeInitializer : Initializer<Unit> {
     override fun create(context: Context) {
-        AutoSize.checkAndInit(context.applicationContext as Application)
+//        AutoSize.checkAndInit(context.applicationContext as Application)
     }
 
     override fun dependencies(): List<Class<out Initializer<*>>> {

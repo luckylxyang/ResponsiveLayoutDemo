@@ -1,5 +1,14 @@
 import java.net.URI
 
+include(":baseLibrary")
+
+
+include(":libraryC")
+
+
+include(":libraryA")
+
+
 
 pluginManagement {
     repositories {

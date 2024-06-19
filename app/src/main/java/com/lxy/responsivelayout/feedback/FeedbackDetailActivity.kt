@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.lxy.responsivelayout.R
 import com.lxy.responsivelayout.base.BaseComposeActivity
+import com.lxy.responsivelayout.gesture.LazyGridDragAndDropDemo
 
 /**
  *
@@ -59,7 +60,7 @@ import com.lxy.responsivelayout.base.BaseComposeActivity
 
 class FeedbackDetailActivity : BaseComposeActivity() {
     @Composable
-    override fun setContent() = FeedbackDetailScreenPage()
+    override fun setContent() = LazyGridDragAndDropDemo() //FeedbackDetailScreenPage()
 
 }
 
