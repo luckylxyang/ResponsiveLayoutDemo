@@ -1,6 +1,8 @@
 package com.lxy.responsivelayout.search
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -38,6 +40,28 @@ class SearchActivity : AppCompatActivity() {
     private fun initView(){
         binding.viewPager.adapter = SearchPagerAdapter(supportFragmentManager, searchPageProviders.toList())
         binding.tabLayout.setupWithViewPager(binding.viewPager)
+        binding.btn.setOnClickListener {
+            val dialog = DownloadDialog(this)
+            dialog.initDialog()
+            // 模拟更新进度
+            val handler = Handler(Looper.getMainLooper())
+            handler.postDelayed(object : Runnable {
+                private var progress = 0
+
+                override fun run() {
+                    if (progress <= 100) {
+                        dialog.setProgress(progress)
+                        progress += 1
+                        handler.postDelayed(this, 100)
+                    }
+                }
+            }, 100)
+        }
+        PermissionDialog(this).initDialog {
+            AppModeDialog(this).initDialog {
+
+            }
+        }
     }
 
     class SearchPagerAdapter(
