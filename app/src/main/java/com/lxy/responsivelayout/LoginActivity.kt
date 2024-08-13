@@ -49,12 +49,12 @@ class LoginActivity : ComponentActivity() {
 //                    val windowSizeClass = calculateWindowSizeClass(this)
 //                    Greeting(windowSizeClass)
 //                    MainPage()
-//                    GestureDragPage()
+                    GestureDragPage()
 //                    NetworkDiagnosticScreen()
 //                    ContactsScreen()
 //                    HomeEditScreenPage()
 //                    LazyGridDragAndDropDemo()
-                    HomeHorizontalScreenPage()
+//                    HomeHorizontalScreenPage()
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.lxy.responsivelayout.gesture
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectDragGestures
@@ -7,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -31,7 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.lxy.responsivelayout.R
@@ -71,10 +76,11 @@ fun GestureDragPage() {
         },
     ) { innerPadding ->
 
-        Surface(
-            modifier = Modifier.padding(innerPadding)
+        Box(
+            modifier = Modifier.padding(innerPadding).fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            GestureLock(Modifier.fillMaxSize())
+            GestureLock()
         }
     }
 }
@@ -86,19 +92,20 @@ fun GestureLock(
     drawEnd: ((List<Int>) -> Unit)? = null,
     selectColor : Color = Color.Blue,
     defaultColor : Color = Color.Gray,
-    circleRadius: Int = 30
+    circleRadius: Int = 30,
+    circleMarginDp: Int = 30
 ) {
     var path by remember { mutableStateOf(Path()) }
     val points = remember { mutableStateListOf<Offset>() }
     val selectedCircles = remember { mutableStateListOf<Int>() }
     val circleRadiusPx = with(LocalDensity.current) { circleRadius.dp.toPx() }
-    val circleMargin = with(LocalDensity.current) { 40.dp.toPx() }
+    val circleMargin = with(LocalDensity.current) { circleMarginDp.dp.toPx() }
 
+    // 计算整个九宫格的大小
+    val gridWidth = (3 * (circleRadius * 2 + circleMarginDp)) + circleMarginDp
     Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .fillMaxSize()
-            .padding(16.dp)
+        contentAlignment = Alignment.TopCenter,
+        modifier = Modifier
             .pointerInput(Unit) {
                 detectDragGestures(
                     onDragStart = { offset ->
@@ -108,7 +115,7 @@ fun GestureLock(
                             points.add(getCircleCenter(index, circleRadiusPx, circleMargin))
                             path = updatePath(points)
                         }
-                        if (drawStart != null){
+                        if (drawStart != null) {
                             drawStart()
                         }
                     },
@@ -125,7 +132,7 @@ fun GestureLock(
                     },
                     onDragEnd = {
 
-                        if (drawEnd != null && points.isNotEmpty()){
+                        if (drawEnd != null && points.isNotEmpty()) {
                             drawEnd(selectedCircles)
                         }
                         points.clear()
@@ -135,7 +142,9 @@ fun GestureLock(
                 )
             }
     ) {
-        Canvas(modifier = Modifier.fillMaxSize().align(Alignment.Center)) {
+        Canvas(modifier = Modifier
+            .size(gridWidth.dp)
+            .align(Alignment.Center)) {
             for (i in 0..8) {
                 val center = getCircleCenter(i, circleRadiusPx, circleMargin)
                 val isSelect = selectedCircles.contains(i)
@@ -155,6 +164,8 @@ fun GestureLock(
         }
     }
 }
+
+
 
 private fun detectCircle(offset: Offset, circleRadius: Float, circleMargin: Float): Int {
     for (i in 0..8) {
